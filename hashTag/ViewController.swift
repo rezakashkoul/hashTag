@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         title = "HASHTAG!"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        view.backgroundColor = UIColor.yellow
+        view.backgroundColor = UIColor.cyan
         navigationItem.leftBarButtonItem?.isEnabled = false
     }
     
@@ -71,8 +71,8 @@ class ViewController: UIViewController {
             if senderView.frame.origin.x + senderView.frame.size.width > view.frame.width {
                 senderView.frame.origin = CGPoint(x: view.frame.width - senderView.frame.size.width, y: senderView.frame.origin.y)
             }
-            if senderView.frame.origin.y + senderView.frame.size.height > view.frame.height {
-                senderView.frame.origin = CGPoint(x: senderView.frame.origin.x, y: view.frame.height - bottomSafeArea - senderView.frame.size.height)
+            if senderView.frame.origin.y + senderView.frame.size.height > view.frame.height - bottomSafeArea {
+                senderView.frame.origin = CGPoint(x: senderView.frame.origin.x, y: view.frame.height - senderView.frame.size.height - bottomSafeArea)
             }
         }
         stickerYPosition = point.y
