@@ -22,37 +22,63 @@ class ViewController: UIViewController {
     
     func initialSetup() {
         title = "HASHTAG!"
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSticker))
-        view.backgroundColor = UIColor.lightGray
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        view.backgroundColor = UIColor.yellow
+        navigationItem.leftBarButtonItem?.isEnabled = false
     }
     
-    @objc private func addSticker() {
+    @objc private func add() {
         if stickerView == nil {
             addStickerView()
             view.layoutIfNeeded()
             setupPanGesture()
-            //            navigationItem.rightBarButtonItem?.isEnabled = false
-        } else {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+            navigationItem.leftBarButtonItem?.isEnabled = true
         }
     }
     
+    @objc private func cancel() {
+        for subview in view.subviews as [UIView] {
+            subview.removeFromSuperview()
+        }
+        stickerView = nil
+        stickerYPosition = 0
+        navigationItem.leftBarButtonItem?.isEnabled = false
+        navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+    
     private func setupPanGesture() {
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.panGesture))
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panGesture))
         stickerView.addGestureRecognizer(panGesture)
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:))))
+        view.addGestureRecognizer(UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:))))
     }
     
     @objc private func panGesture(sender: UIPanGestureRecognizer){
         let point = sender.location(in: view)
         let panGesture = sender.view
+        let topSafeArea = view.safeAreaInsets.top
+        let bottomSafeArea = view.safeAreaInsets.bottom
         panGesture?.center = point
-        print(point)
-        print(stickerView.frame)
+        
+        if let senderView = sender.view {
+            if senderView.frame.origin.x < 0.0 {
+                senderView.frame.origin = CGPoint(x: 0.0, y: senderView.frame.origin.y)
+            }
+            if senderView.frame.origin.y < topSafeArea {
+                senderView.frame.origin = CGPoint(x: senderView.frame.origin.x, y: topSafeArea)
+            }
+            if senderView.frame.origin.x + senderView.frame.size.width > view.frame.width {
+                senderView.frame.origin = CGPoint(x: view.frame.width - senderView.frame.size.width, y: senderView.frame.origin.y)
+            }
+            if senderView.frame.origin.y + senderView.frame.size.height > view.frame.height {
+                senderView.frame.origin = CGPoint(x: senderView.frame.origin.x, y: view.frame.height - bottomSafeArea - senderView.frame.size.height)
+            }
+        }
         stickerYPosition = point.y
         textField.resignFirstResponder()
-        // If you want to disable editing after changing location like instagram, uncomment the code bellow
-        //        textField.isEnabled = false
+        //MARK: If you want to disable editing after changing location like instagram, uncomment the code bellow
+        //                textField.isEnabled = false
     }
     
 }
@@ -138,40 +164,19 @@ extension ViewController {
     //MARK: UI Constraints:
     fileprivate func addConstraints() {
         textField.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             NSLayoutConstraint(item: textField!, attribute: .leading, relatedBy: .equal, toItem: label, attribute: .trailing, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: textField!, attribute: .trailing, relatedBy: .equal, toItem: stickerView, attribute: .trailing, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: textField!, attribute: .top, relatedBy: .equal, toItem: stickerView, attribute: .top, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: textField!, attribute: .bottom, relatedBy: .equal, toItem: stickerView, attribute: .bottom, multiplier: 1, constant: 0)
         ])
+        
         NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: label!,
-                               attribute: .leading,
-                               relatedBy: .equal,
-                               toItem: stickerView,
-                               attribute: .leading,
-                               multiplier: 1,
-                               constant: 0),
-            NSLayoutConstraint(item: label!,
-                               attribute: .trailing,
-                               relatedBy: .equal,
-                               toItem: textField,
-                               attribute: .leading,
-                               multiplier: 1,
-                               constant: 0),
-            NSLayoutConstraint(item: label!,
-                               attribute: .top,
-                               relatedBy: .equal,
-                               toItem: textField, attribute: .top,
-                               multiplier: 1,
-                               constant: 0),
-            NSLayoutConstraint(item: label!,
-                               attribute: .bottom,
-                               relatedBy: .equal,
-                               toItem: textField,
-                               attribute: .bottom,
-                               multiplier: 1,
-                               constant: 0)
+            NSLayoutConstraint(item: label!, attribute: .leading, relatedBy: .equal, toItem: stickerView, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: label!, attribute: .trailing, relatedBy: .equal, toItem: textField, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: label!, attribute: .top, relatedBy: .equal, toItem: textField, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: label!, attribute: .bottom, relatedBy: .equal, toItem: textField, attribute: .bottom, multiplier: 1, constant: 0)
         ])
     }
     
