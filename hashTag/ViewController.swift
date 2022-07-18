@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     
     func initialSetup() {
         title = "HASHTAG!"
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSticker))
         view.backgroundColor = UIColor.lightGray
     }
@@ -66,6 +66,7 @@ extension ViewController: UITextFieldDelegate {
         let newWidth = min(label.frame.width + textField.bounds.width, UIScreen.main.bounds.width)
         let newFrame = CGRect(x: 0, y: 0, width: newWidth, height: (textField.font!.pointSize + 35 ))
         let labelWidth = textField.font!.pointSize + 35
+        label.font = UIFont.systemFont(ofSize: textField.font!.pointSize)
         label.frame = CGRect(x: 0, y: 0, width: 25, height: labelWidth )
         stickerView.frame = newFrame
         stickerView.center = view.center
@@ -91,6 +92,8 @@ extension ViewController {
         let width: CGFloat = 145
         stickerView = UIView(frame: CGRect(x: centerScreenWidth-width/2, y: centerScreenHeight-height/2, width: width, height: height))
         stickerView.backgroundColor = .white
+        stickerView.layer.cornerRadius = 6
+        stickerView.clipsToBounds = true
         addTextField()
         addLabel()
         view.addSubview(stickerView)
